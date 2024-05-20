@@ -28,6 +28,7 @@
             id="quiz-selector"
             v-model="selectedQuiz"
             class="block w-full p-2 border rounded"
+            @change="resetWrongINdexes"
           >
             <option
               v-for="quizName in quizNames"
@@ -423,8 +424,11 @@
             // Return the shuffled copy
             return shuffledAnswers;
           },
-          submitQuiz() {
+          resetWrongINdexes() {
             this.wrongIndexes = [];
+          },
+          submitQuiz() {
+            this.resetWrongINdexes();
             let score = 0;
             this.currentQuiz.questions.forEach((question, index) => {
               if (Array.isArray(question.answer)) {
