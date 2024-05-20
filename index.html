@@ -424,6 +424,7 @@
             return shuffledAnswers;
           },
           submitQuiz() {
+            this.wrongIndexes = [];
             let score = 0;
             this.currentQuiz.questions.forEach((question, index) => {
               if (Array.isArray(question.answer)) {
