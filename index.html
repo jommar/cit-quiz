@@ -46,9 +46,16 @@
             :key="index"
             class="mb-6"
           >
-            <p class="text-xl mb-2">{{ question.text }}</p>
+            <p
+              v-if="wrongIndexes.includes(index)"
+              class="text-xl mb-2"
+              style="color: red"
+            >
+              {{ question.text }}
+            </p>
+            <p v-else class="text-xl mb-2">{{ question.text }}</p>
             <div
-              v-for="option in shuffleAnswers(question.options)"
+              v-for="option in question.shufOptions || question.options"
               :key="option"
               class="mb-2"
             >
@@ -81,12 +88,19 @@
         template: "#quiz-template",
         computed: {
           currentQuiz() {
-            return this.quizzes[this.selectedQuiz];
+            const quiz = JSON.parse(
+              JSON.stringify(this.quizzes[this.selectedQuiz])
+            );
+            quiz.questions.forEach((question) => {
+              question.shufOptions = this.shuffleAnswers(question.options);
+            });
+            return quiz;
           },
         },
         data() {
           return {
             selectedQuiz: "",
+            wrongIndexes: [],
             quizNames: [
               "Basic Programming in Robotics (Movement + Wait + LED)",
               "Autonomous Maze Explorer mBot",
@@ -394,25 +408,32 @@
         },
         methods: {
           shuffleAnswers(answers) {
-            for (let i = answers.length - 1; i > 0; i--) {
+            // Create a copy of the answers array
+            const shuffledAnswers = [...answers];
+
+            // Shuffle the copied array
+            for (let i = shuffledAnswers.length - 1; i > 0; i--) {
               const j = Math.floor(Math.random() * (i + 1));
-              [answers[i], answers[j]] = [answers[j], answers[i]]; // Swap elements
+              [shuffledAnswers[i], shuffledAnswers[j]] = [
+                shuffledAnswers[j],
+                shuffledAnswers[i],
+              ]; // Swap elements
             }
-            return answers;
+
+            // Return the shuffled copy
+            return shuffledAnswers;
           },
           submitQuiz() {
             let score = 0;
             this.currentQuiz.questions.forEach((question, index) => {
               if (Array.isArray(question.answer)) {
                 // If question.answer is an array, check if the user's answer is included in it
-                if (question.answer.includes(this.answers[index])) {
-                  score++;
-                }
+                if (question.answer.includes(this.answers[index])) score++;
+                else this.wrongIndexes.push(index);
               } else {
                 // If question.answer is not an array, compare directly
-                if (this.answers[index] === question.answer) {
-                  score++;
-                }
+                if (this.answers[index] === question.answer) score++;
+                else this.wrongIndexes.push(index);
               }
             });
             alert(
