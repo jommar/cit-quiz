@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz App</title>
+    <!-- Tailwind CSS CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <!-- Vue.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div id="app" class="container mx-auto py-10">
+      <quiz></quiz>
+    </div>
+
+    <!-- Quiz Component Template -->
+    <template id="quiz-template">
+      <div class="quiz-container bg-white p-6 rounded-lg shadow-lg">
+        <div class="mb-4">
+          <label for="quiz-selector" class="block text-lg font-medium mb-2"
+            >Select a Quiz:</label
+          >
+          <select
+            id="quiz-selector"
+            v-model="selectedQuiz"
+            class="block w-full p-2 border rounded"
+          >
+            <option
+              v-for="quizName in quizNames"
+              :key="quizName"
+              :value="quizName"
+            >
+              {{ quizName }}
+            </option>
+          </select>
+        </div>
+        <h1 class="text-3xl font-bold mb-4" v-if="quiz">{{ quiz.title }}</h1>
+
+        <section v-if="selectedQuiz">
+          <div
+            v-for="(question, index) in currentQuiz.questions"
+            :key="index"
+            class="mb-6"
+          >
+            <p class="text-xl mb-2">{{ question.text }}</p>
+            <div
+              v-for="option in shuffleAnswers(question.options)"
+              :key="option"
+              class="mb-2"
+            >
+              <label class="flex items-center">
+                <input
+                  type="radio"
+                  :name="'question' + index"
+                  :value="option"
+                  v-model="answers[index]"
+                  class="mr-2"
+                />
+                {{ option }}
+              </label>
+            </div>
+          </div>
+          <button
+            v-if="currentQuiz"
+            @click="submitQuiz"
+            class="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Submit
+          </button>
+        </section>
+      </div>
+    </template>
+
+    <!-- Vue App Script -->
+    <script>
+      Vue.component("quiz", {
+        template: "#quiz-template",
+        computed: {
+          currentQuiz() {
+            return this.quizzes[this.selectedQuiz];
+          },
+        },
+        data() {
+          return {
+            selectedQuiz: "",
+            quizNames: [
+              "Basic Programming in Robotics (Movement + Wait + LED)",
+              "Autonomous Maze Explorer mBot",
+              "Programming (Avoiding Obstacles)",
+              "Programming (Parking mBot)",
+              "The Computer's Soft Stuff (Sight, Sound, and Motion. Introduction to multimedia)",
+              "The Computer, Live! (Multimedia Software)",
+              "Cyberspace (The Internet)",
+              "Cyberspace (Netiquette & Internet Safety)",
+            ],
+            quizzes: {
+              "Basic Programming in Robotics (Movement + Wait + LED)": {
+                title: "Basic Programming in Robotics (Movement + Wait + LED)",
+                questions: [
+                  {
+                    text: "What does a Light-Emitting Diode (LED) do?",
+                    options: [
+                      "It Emits light",
+                      "Make the mBot move",
+                      "Make the mBot turn",
+                    ],
+                    answer: "It Emits light",
+                  },
+                  {
+                    text: "Where is the LED located?",
+                    options: ["Microcontroller", "Battery", "Wheel", "Chassis"],
+                    answer: "Microcontroller",
+                  },
+                  {
+                    text: "The mCore has how many onboard LEDs?",
+                    options: ["One", "Two", "Three", "Four"],
+                    answer: "Two",
+                  },
+                  {
+                    text: "The LEDs shows the primary colors, Which one is not a color of the LED?",
+                    options: ["Red", "Green", "Blue", "White"],
+                    answer: "White",
+                  },
+                  {
+                    text: "It is used as a starting block every time you simulate a robot in Miranda Simulator",
+                    options: [
+                      "Start Up Block",
+                      "LED Block",
+                      "Wait Block",
+                      "Movement Block",
+                    ],
+                    answer: "Start Up",
+                  },
+                  {
+                    text: "It is used to control the onboard LED in the mBots core",
+                    options: [
+                      "Start Up Block",
+                      "LED Block",
+                      "Wait Block",
+                      "Movement Block",
+                    ],
+                    answer: "LED",
+                  },
+                  {
+                    text: "It is used to indicate the time interval for each block, the number value represents time.",
+                    options: [
+                      "Start Up Block",
+                      "LED Block",
+                      "Wait Block",
+                      "Movement Block",
+                    ],
+                    answer: "Wait Block",
+                  },
+                  {
+                    text: "It is used to move the mBot forward, backward, and sideward.",
+                    options: [
+                      "Start Up Block",
+                      "LED Block",
+                      "Wait Block",
+                      "Movement Block",
+                    ],
+                    answer: "Movement Block",
+                  },
+                ],
+              },
+              "Autonomous Maze Explorer mBot": {
+                title: "Autonomous Maze Explorer mBot",
+                questions: [
+                  {
+                    text: "What another name for a maze?",
+                    options: ["Forest", "Cave", "Labyrinth"],
+                    answer: "Labyrinth",
+                  },
+                  {
+                    text: "Can a maze be both simple and complex?",
+                    options: [
+                      "Just simple",
+                      "Just Complex",
+                      "Both, simple and complex",
+                    ],
+                    answer: "Both, simple and complex",
+                  },
+                  {
+                    text: "What does your mBot need to solve a maze?",
+                    options: [
+                      "Movement Block",
+                      "Wait Block",
+                      "LED Block",
+                      "Start up Block",
+                    ],
+                    answer: ["Movement Block", "Wait Block"],
+                  },
+                  {
+                    text: "Whick of these makes the mBot move forward FAST?",
+                    options: [
+                      "Left Wheel at 100% power, right Wheel at 100% power",
+                      "Left Wheel at 20% power, right Wheel at 20% power",
+                      "Left Wheel at 100% power, right Wheel at 20% power",
+                      "Left Wheel at 20% power, right Wheel at 100% power",
+                    ],
+                    answer:
+                      "Left Wheel at 100% power, right Wheel at 100% power",
+                  },
+                  {
+                    text: "Whick of these makes the mBot turn to the LEFT?",
+                    options: [
+                      "Left Wheel at 100% power, right Wheel at 100% power",
+                      "Left Wheel at 20% power, right Wheel at 20% power",
+                      "Left Wheel at 100% power, right Wheel at 20% power",
+                      "Left Wheel at 20% power, right Wheel at 100% power",
+                    ],
+                    answer:
+                      "Left Wheel at 20% power, right Wheel at 100% power",
+                  },
+                  {
+                    text: "Whick of these makes the mBot turn to the RIGHT?",
+                    options: [
+                      "Left Wheel at 100% power, right Wheel at 100% power",
+                      "Left Wheel at 20% power, right Wheel at 20% power",
+                      "Left Wheel at 100% power, right Wheel at 20% power",
+                      "Left Wheel at 20% power, right Wheel at 100% power",
+                    ],
+                    answer:
+                      "Left Wheel at 100% power, right Wheel at 20% power",
+                  },
+                ],
+              },
+              "Programming (Avoiding Obstacles)": {
+                title: "Programming (Avoiding Obstacles)",
+                questions: [
+                  {
+                    text: "It is the ability of the robot to avoid walls or barriers blocking its way",
+                    options: [
+                      "Obstacle avoidance",
+                      "Maze Running",
+                      "Travel Guidance",
+                    ],
+                    answer: "Obstacle avoidance",
+                  },
+                  {
+                    text: "What is used to avoid obstacles?",
+                    options: [
+                      "Movement and Wait Block",
+                      "Movement and LED Block",
+                      "LED and Wait Block",
+                    ],
+                    answer: "Movement and Wait Block",
+                  },
+                  {
+                    text: "What block is used to execute the blocks connected to it every time the RUN or PLAY button is clicked?",
+                    options: [
+                      "Start Up Block",
+                      "Movement Block",
+                      "LED Block",
+                      "Wait Block",
+                    ],
+                    answer: "Start Up Block",
+                  },
+                  {
+                    text: "This indicates the time interval for each block. The number value in the block represents time.",
+                    options: [
+                      "Start Up Block",
+                      "Movement Block",
+                      "LED Block",
+                      "Wait Block",
+                    ],
+                    answer: "Wait Block",
+                  },
+                  {
+                    text: "This is to control the mBot to move forward, backward, and sideward.",
+                    options: [
+                      "Start Up Block",
+                      "Movement Block",
+                      "LED Block",
+                      "Wait Block",
+                    ],
+                    answer: "Movement Block",
+                  },
+                  {
+                    text: "This is used to display different colors of light.",
+                    options: [
+                      "Start Up Block",
+                      "Movement Block",
+                      "LED Block",
+                      "Wait Block",
+                    ],
+                    answer: "LED Block",
+                  },
+                ],
+              },
+              "Programming (Parking mBot)": {
+                title: "Programming (Parking mBot)",
+                questions: [
+                  {
+                    text: "Can the mBot can park in a designated place",
+                    options: ["Yes", "No"],
+                    answer: "Yes",
+                  },
+                  {
+                    text: "What is used to park the mBot?",
+                    options: [
+                      "Movement and Wait Block",
+                      "Movement and LED Block",
+                      "LED and Wait Block",
+                    ],
+                    answer: "Movement and Wait Block",
+                  },
+                  {
+                    text: "What is used to show whether the space is occupied or not?",
+                    options: [
+                      "Movement Block",
+                      "Wait Block",
+                      "LED and Movement Block",
+                      "LED Block",
+                    ],
+                    answer: "LED Block",
+                  },
+                  {
+                    text: "What a motor converts the battery’s energy into movement?",
+                    options: ["AC Motor", "DC Motor"],
+                    answer: "DC Motor",
+                  },
+                ],
+              },
+              "The Computer's Soft Stuff (Sight, Sound, and Motion. Introduction to multimedia)":
+                {
+                  title:
+                    "The Computer's Soft Stuff (Sight, Sound, and Motion. Introduction to multimedia)",
+                  questions: [
+                    {
+                      text: "What is a multimedia",
+                      options: [
+                        "A computer software that is used to watch video or play music",
+                        "A computer software that is used to type letters",
+                        "A computer software that is used to send email",
+                      ],
+                      answer:
+                        "A computer software that is used to watch video or play music",
+                    },
+                    {
+                      text: "YouTube, is what type of multimedia",
+                      options: [
+                        "Audio",
+                        "Video",
+                        "Animation",
+                        "Graphics",
+                        "Games",
+                      ],
+                      answer: "Video",
+                    },
+                    {
+                      text: "Spotify, is what type of multimedia",
+                      options: [
+                        "Audio",
+                        "Video",
+                        "Animation",
+                        "Graphics",
+                        "Games",
+                      ],
+                      answer: "Audio",
+                    },
+                    {
+                      text: "Photoshop, is what type of multimedia",
+                      options: [
+                        "Audio",
+                        "Video",
+                        "Animation",
+                        "Graphics",
+                        "Games",
+                      ],
+                      answer: "Graphics",
+                    },
+                    {
+                      text: "Roblox, is what type of multimedia",
+                      options: [
+                        "Audio",
+                        "Video",
+                        "Animation",
+                        "Graphics",
+                        "Games",
+                      ],
+                      answer: "Games",
+                    },
+                  ],
+                },
+            },
+            quiz: null,
+            answers: {},
+          };
+        },
+        methods: {
+          shuffleAnswers(answers) {
+            for (let i = answers.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [answers[i], answers[j]] = [answers[j], answers[i]]; // Swap elements
+            }
+            return answers;
+          },
+          submitQuiz() {
+            let score = 0;
+            this.currentQuiz.questions.forEach((question, index) => {
+              if (Array.isArray(question.answer)) {
+                // If question.answer is an array, check if the user's answer is included in it
+                if (question.answer.includes(this.answers[index])) {
+                  score++;
+                }
+              } else {
+                // If question.answer is not an array, compare directly
+                if (this.answers[index] === question.answer) {
+                  score++;
+                }
+              }
+            });
+            alert(
+              `You scored ${score} out of ${this.currentQuiz.questions.length}`
+            );
+          },
+        },
+      });
+
+      new Vue({
+        el: "#app",
+      });
+    </script>
+  </body>
+</html>
